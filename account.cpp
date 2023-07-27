@@ -1,71 +1,49 @@
 #include "account.h"
 
-vector<Account> loadAccounts() {
-    // Load existing accounts from SignUp.txt file and add them to the accounts vector
-    // Each line of the file contains 1 account with username and password separated by a space
+void loadAccounts(vector<Account> &accounts) {
     ifstream ifs("SignUp.txt");
-    vector<Account> accounts;
-    string line;
-
     if (!ifs.is_open())
-        return accounts;
-    
-    while (!ifs.eof()) {
+        return;
+
+    string line;
+    while (getline(ifs, line)) {
         Account acc;
-        getline(ifs, line);
         stringstream ss(line);
         getline(ss, acc.username, ' ');
         getline(ss, acc.password, ' ');
+        addUsernameToBloomFilter(acc.username);
         accounts.push_back(acc);
     }
     ifs.close();
-
-    return accounts;
 }
 
-vector<string> loadWeakPasswords() {
-    // Load weak passwords from WeakPass.txt file and add them to the weakPasswords vector
+void loadWeakPasswords() {
     ifstream ifs("WeakPass.txt");
-    vector<string> passwords;
-
     if (!ifs.is_open())
-        return passwords;
-    
-    while (!ifs.eof()) {
-        string pass;
-        getline(ifs, pass);
-        passwords.push_back(pass);
+        return;
+
+    string pass;
+    while (getline(ifs, pass, '\n')) {
+        if (!isWeakPassword(pass))
+            addWeakPasswordToBloomFilter(pass);
     }
     ifs.close();
-
-    return passwords;
 }
 
-bool isValidAccount(vector<Account> accounts, vector<string> weakPasswords, Account acc) {
-    // Check constraints for username and return true/false accordingly
-    if (acc.username.size() <= 5 || acc.username.size() >= 10) {
-        return false;
-    }
-
-    if (acc.username.find(' ') != -1) {
-        return false;
-    }
-
-    for (int i = 0; i < accounts.size(); i++)
-        if (accounts[i].username == acc.username) {
-            return false;
-        }
-    
+bool isValidPassword(Account acc) {
     // Check constraints for password and return true/false accordingly
     if (acc.password.size() <= 10 || acc.password.size() >= 20) {
+        cout << "Length of password must be in the range of (10, 20). . ." << endl;
         return false;
     }
 
     if (acc.password.find(' ') != -1) {
+        cout << "Password must not contain SPACE inside . . ." << endl;
         return false;
     }
     
     if (acc.password == acc.username) {
+        cout << "Password must not contain username . . ." << endl;
     }
 
     bool hasUpperCase = false;
@@ -85,15 +63,38 @@ bool isValidAccount(vector<Account> accounts, vector<string> weakPasswords, Acco
     }
 
     if (!(hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar)) {
+        cout << "Password must have at least one uppercase character, one lowercase character, one number and one special character . . ." << endl;
         return false;
     }
 
-    for (int i = 0; i < weakPasswords.size(); i++)
-        if (weakPasswords[i] == acc.password) {
-            return false;
-        }
+    if (isWeakPassword(acc.password)) {
+        cout << "Your password is too weak . . ." << endl;
+        return false;
+    }
 
-    // OK > True
+    return true;
+}
+
+bool isValidAccount(vector<Account> accounts, Account acc) {
+    // Check constraints for username and return true/false accordingly
+    if (acc.username.size() <= 5 || acc.username.size() >= 10) {
+        cout << "Length of username must be in the range of (5, 10) . . ." << endl;
+        return false;
+    }
+
+    if (acc.username.find(' ') != -1) {
+        cout << "Username must not contain SPACE inside . . ." << endl;
+        return false;
+    }
+
+    if (isUserExists(acc.username)) {
+        cout << "Your username is registered . . ." << endl;
+        return false;
+    }
+    
+    if (!isValidPassword(acc))
+        return false;
+
     return true;
 }
 
@@ -111,7 +112,21 @@ void saveAccount(Account newAccount) {
     ofs.close();
 }
 
-void registerAccount(vector<Account> accounts, vector<string> weakPasswords) {
+void writeFail(string username, string password) {
+    // Note the sign-up information fail due to constraints violation to Fail.txt file
+    ofstream ofs("Fail.txt", ios::app);
+
+    if (!ofs.is_open()) {
+        cout << "Error: Unable to save accounts to SignUp.txt" << endl;
+        return;
+    }
+
+    ofs << username << " " << password << endl;
+
+    ofs.close();
+}
+
+void registerAccount(vector<Account> accounts) {
     // Register a single account if it meets all constraints and add it to the accounts vector
     // Input account 
     Account newAccount;
@@ -121,16 +136,17 @@ void registerAccount(vector<Account> accounts, vector<string> weakPasswords) {
     cin >> newAccount.password;
 
     // Check new account
-    if (isValidAccount(accounts, weakPasswords, newAccount)) {
+    if (isValidAccount(accounts, newAccount)) {
         accounts.push_back(newAccount);
         saveAccount(newAccount);
+        addUsernameToBloomFilter(newAccount.username);
         cout << "Account registered successfully!" << endl;
     } else {
-        cout << "Invalid username or password. Account registration failed . . ." << endl;
+        writeFail(newAccount.username, newAccount.password);
     }
 }
 
-void multipleRegistrations(vector<Account> accounts, vector<string> weakPasswords) {
+void multipleRegistrations(vector<Account> accounts) {
     // Register multiple accounts provided in accountsData and add them to the accounts vector
     // Input account 
     vector<Account> listNewAccounts;
@@ -145,7 +161,7 @@ void multipleRegistrations(vector<Account> accounts, vector<string> weakPassword
         cin >> newAccount.password;
         listNewAccounts.push_back(newAccount);
 
-        cout << "Press 1 to continue generating another account . . .";
+        cout << "Press 1 to stop generating multiple accounts . . ." << endl;
         cin >> check;
         if (check == '1')
             stop = true;
@@ -153,64 +169,67 @@ void multipleRegistrations(vector<Account> accounts, vector<string> weakPassword
 
     // Check new accounts
     for (int i = 0; i < listNewAccounts.size(); i++) {
-        if (isValidAccount(accounts, weakPasswords, listNewAccounts[i])) {
+        if (isValidAccount(accounts, listNewAccounts[i])) {
             accounts.push_back(listNewAccounts[i]);
             saveAccount(listNewAccounts[i]);
             cout << "Account for username " << listNewAccounts[i].username << " registered successfully!" << endl;
         } else {
-            cout << "Invalid username or password for account: " << listNewAccounts[i].username << ". Account registration failed . . ." << endl;
+            writeFail(listNewAccounts[i].username, listNewAccounts[i].password);
         }
     }
 }
 
 bool checkLogIn(vector<Account> accounts, Account account) {
-    for (int i = 0; i < accounts.size(); i++) {
-        if (accounts[i].username == account.username && accounts[i].password == account.password)
-            return true;
-
-        if (accounts[i].username == account.username && accounts[i].password != account.password) {
-            do {
-                cout << "Wrong password. Try again . . . " << endl;
-                getline(cin, account.password, '\n');
-            } while (accounts[i].password != account.password);
-            return true;
-        }
+    int find;
+    if (isUserExists(account.username)) {
+        for (int i = 0; i < accounts.size(); i++) 
+            if (accounts[i].username == accounts[i].username && accounts[i].password == account.password)
+                return true;
+        cout << "Wrong password . . . " << endl;
+    } else {
+        cout << "Invalid username . . . " << endl;
     }
-    cout << "Invalid username . . . " << endl;
     return false;
 }
 
-void login(vector<Account> accounts) {
+void login(vector<Account> accounts, Account &acc) {
     Account account;
-    do {
-        cout << "USERNAME: ";
-        getline(cin, account.username, '\n');
-        cout << "PASSWORD: ";
-        getline(cin, account.password, '\n');
-    } while (!checkLogIn(accounts, account));
+    cout << "USERNAME: ";
+    cin >> account.username;
+    cout << "PASSWORD: ";
+    cin >> account.password;
+    if (checkLogIn(accounts, account)) {
+        acc.username = account.username;
+        acc.password = account.password;
+    }
 }
 
-void changePassword(vector<Account> accounts, vector<string> weakPasswords, Account &account) {
+void changePassword(vector<Account> accounts, Account &account) {
     string newPassword;
     string newPasswordCheck;
     cout << "NEW PASSWORD: ";
-    getline(cin, newPassword, '\n');
+    cin >> newPassword;
     cout << "CONFIRM: ";
-    getline(cin, newPasswordCheck, '\n');
+    cin >> newPasswordCheck;
     if (newPassword == newPasswordCheck) {
         Account acc;
         acc.username = account.username;
         acc.password = newPassword;
-        if (isValidAccount(accounts, weakPasswords, acc)) {
+        if (isValidPassword(acc)) {
             account.password = newPassword;
             ofstream ofs("SignUp.txt");
             if (!ofs.is_open())
                 return;
             
             for (int i = 0; i < accounts.size(); i++) {
-                ofs << accounts[i].username << " " << accounts[i].password << endl;
+                if (accounts[i].username == account.username) {
+                    ofs << account.username << " " << account.password << endl;
+                } else {
+                    ofs << accounts[i].username << " " << accounts[i].password << endl;
+                }
             }
 
+            cout << "Your password has successfully changed!" << endl;
             ofs.close();
         }
     }

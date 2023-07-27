@@ -1,7 +1,9 @@
 #ifndef ACCOUNT_H
 #define ACCOUNT_H
 
+
 #include "lib.h"
+#include "bloom-filter.cpp"
 
 struct Account {
     string username;
@@ -9,20 +11,22 @@ struct Account {
 };
 
 // Helper Function
-vector<Account> loadAccounts();
-vector<string> loadWeakPasswords();
-bool isValidAccount(vector<Account> accounts, vector<string> weakPasswords, Account acc);
+void loadAccounts(vector<Account> &accounts);
+void loadWeakPasswords();
+bool isValidAccount(vector<Account> accounts, Account acc);
 void saveAccount(Account newAccount);
+void writeFail(string username, string password);
 
 // Registration
-void registerAccount(vector<Account> accounts, vector<string> weakPasswords);
-void multipleRegistrations(vector<Account> accounts, vector<string> weakPasswords);
+void registerAccount(vector<Account> accounts);
+void multipleRegistrations(vector<Account> accounts);
 
 // Login
 bool checkLogIn(vector<Account> accounts, Account account) ;
-void login(vector<Account> accounts);
+void login(vector<Account> accounts, Account &acc);
 
 // Change Password
-void changePassword(vector<Account> accounts, vector<string> weakPasswords, Account &account) ;
+void changePassword(vector<Account> accounts, Account &account) ;
+
 
 #endif // ACCOUNT_H

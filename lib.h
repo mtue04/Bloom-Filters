@@ -8,6 +8,9 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
+#include <bitset>
+#include <cstdlib>
+#include <Windows.h>
 
 using namespace std;
 
