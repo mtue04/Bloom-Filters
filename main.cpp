@@ -7,8 +7,8 @@ int main() {
     vector<Account> accounts;
     loadAccounts(accounts);
     loadWeakPasswords();
-
-    int choice;
+    
+    char choice;
     do {
         cout << "========================" << endl;
         cout << "1. Register Account" << endl;
@@ -20,34 +20,35 @@ int main() {
         cin >> choice;
 
         switch (choice) {
-            case 1:
+            case '1':
                 registerAccount(accounts);
                 break;
-            case 2:
+            case '2':
                 multipleRegistrations(accounts);
                 break;
-            case 3:
-                login(accounts, account);
-                cout << "========================" << endl;
-                cout << "1. Change Password" << endl;
-                cout << "2. Log-out" << endl;
-                cout << "========================" << endl;
-                cout << "Enter your choice: ";
-                cin >> choice;
-                switch (choice)
-                {
-                case 1:
-                    changePassword(accounts, account);
-                    break;
-                case 2:
-                    cout << "Logging out . . ." << endl;
-                    break;
-                default:
-                    cout << "Invalid choice. Please try again." << endl;
-                    break;
+            case '3':
+                if (login(accounts, account)) {
+                    cout << "========================" << endl;
+                    cout << "1. Change Password" << endl;
+                    cout << "2. Log-out" << endl;
+                    cout << "========================" << endl;
+                    cout << "Enter your choice: ";
+                    cin >> choice;
+                    switch (choice)
+                    {
+                    case '1':
+                        changePassword(accounts, account);
+                        break;
+                    case '2':
+                        cout << "Logging out . . ." << endl;
+                        break;
+                    default:
+                        cout << "Invalid choice. Please try again." << endl;
+                        break;
+                    }
                 }
                 break;
-            case 4:
+            case '4':
                 {
                     string username;
                     cout << "Enter your username: ";
@@ -60,13 +61,13 @@ int main() {
                     }
                 }
                 break;
-            case 5:
+            case '5':
                 cout << "Exiting program . . ." << endl;
                 break;
             default:
                 cout << "Invalid choice. Please try again." << endl;
         }
-    } while (choice != 4);
+    } while (choice != '4');
 
     return 0;
 }

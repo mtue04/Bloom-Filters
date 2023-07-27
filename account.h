@@ -23,7 +23,7 @@ void multipleRegistrations(vector<Account> accounts);
 
 // Login
 bool checkLogIn(vector<Account> accounts, Account account) ;
-void login(vector<Account> accounts, Account &acc);
+bool login(vector<Account> accounts, Account &acc);
 
 // Change Password
 void changePassword(vector<Account> accounts, Account &account) ;

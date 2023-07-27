@@ -180,7 +180,6 @@ void multipleRegistrations(vector<Account> accounts) {
 }
 
 bool checkLogIn(vector<Account> accounts, Account account) {
-    int find;
     if (isUserExists(account.username)) {
         for (int i = 0; i < accounts.size(); i++) 
             if (accounts[i].username == accounts[i].username && accounts[i].password == account.password)
@@ -192,7 +191,7 @@ bool checkLogIn(vector<Account> accounts, Account account) {
     return false;
 }
 
-void login(vector<Account> accounts, Account &acc) {
+bool login(vector<Account> accounts, Account &acc) {
     Account account;
     cout << "USERNAME: ";
     cin >> account.username;
@@ -201,7 +200,9 @@ void login(vector<Account> accounts, Account &acc) {
     if (checkLogIn(accounts, account)) {
         acc.username = account.username;
         acc.password = account.password;
+        return true;
     }
+    return false;
 }
 
 void changePassword(vector<Account> accounts, Account &account) {
