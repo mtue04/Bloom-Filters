@@ -1,48 +1,48 @@
 #include "lib.h"
 
-const int BLOOM_FILTER_SIZE = 1000;
+const int BLOOM_FILTER_SIZE = 10000;
 bitset<BLOOM_FILTER_SIZE> usernameBF;
 bitset<BLOOM_FILTER_SIZE> weakPasswordBF;
 
 
-int h1(string& key) {
+int h1(string key) {
     long long int hash = 0;
     for (char c : key) {
         hash += static_cast<int>(c);
     }
-    return hash % BLOOM_FILTER_SIZE;
+    return abs(hash) % BLOOM_FILTER_SIZE;
 }
 
-int h2(string& key) {
+int h2(string key) {
     long long int hash = 1;
     for (char c : key) {
         hash *= static_cast<int>(c);
     }
-    return hash % BLOOM_FILTER_SIZE;
+    return abs(hash) % BLOOM_FILTER_SIZE;
 }
 
-int h3(string& key) {
+int h3(string key) {
     long long int hash = 0;
     for (char c : key) {
         hash -= static_cast<int>(c);
     }
-    return (hash % BLOOM_FILTER_SIZE + BLOOM_FILTER_SIZE) % BLOOM_FILTER_SIZE;
+    return (abs(hash) % BLOOM_FILTER_SIZE + BLOOM_FILTER_SIZE) % BLOOM_FILTER_SIZE;
 }
 
-int h4(string& key) {
+int h4(string key) {
     long long int hash = 0;
     for (char c : key) {
         hash ^= static_cast<int>(c);
     }
-    return hash % BLOOM_FILTER_SIZE;
+    return abs(hash) % BLOOM_FILTER_SIZE;
 }
 
-int h5(string& key) {
+int h5(string key) {
     long long int hash = 1;
     for (char c : key) {
         hash = hash * 31 + static_cast<int>(c);
     }
-    return hash % BLOOM_FILTER_SIZE;
+    return abs(hash) % BLOOM_FILTER_SIZE;
 }
 
 void addUsernameToBloomFilter(string username) {

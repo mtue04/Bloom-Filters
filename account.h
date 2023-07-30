@@ -18,15 +18,15 @@ void saveAccount(Account newAccount);
 void writeFail(string username, string password);
 
 // Registration
-void registerAccount(vector<Account> accounts);
-void multipleRegistrations(vector<Account> accounts);
+void registerAccount(vector<Account> &accounts);
+void multipleRegistrations(vector<Account> &accounts);
 
 // Login
 bool checkLogIn(vector<Account> accounts, Account account) ;
 bool login(vector<Account> accounts, Account &acc);
 
 // Change Password
-void changePassword(vector<Account> accounts, Account &account) ;
+void changePassword(vector<Account> &accounts, Account &account) ;
 
 
 #endif // ACCOUNT_H

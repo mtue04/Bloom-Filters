@@ -2,14 +2,16 @@
 
 using namespace std;
 
-int main() {
+int main()
+{
     Account account;
     vector<Account> accounts;
     loadAccounts(accounts);
     loadWeakPasswords();
-    
+
     char choice;
-    do {
+    do
+    {
         cout << "========================" << endl;
         cout << "1. Register Account" << endl;
         cout << "2. Multiple Registrations" << endl;
@@ -19,15 +21,19 @@ int main() {
         cout << "Enter your choice: ";
         cin >> choice;
 
-        switch (choice) {
-            case '1':
-                registerAccount(accounts);
-                break;
-            case '2':
-                multipleRegistrations(accounts);
-                break;
-            case '3':
-                if (login(accounts, account)) {
+        switch (choice)
+        {
+        case '1':
+            registerAccount(accounts);
+            break;
+        case '2':
+            multipleRegistrations(accounts);
+            break;
+        case '3':
+            if (login(accounts, account))
+            {
+                while (choice != '2')
+                {
                     cout << "========================" << endl;
                     cout << "1. Change Password" << endl;
                     cout << "2. Log-out" << endl;
@@ -44,28 +50,30 @@ int main() {
                         break;
                     default:
                         cout << "Invalid choice. Please try again." << endl;
-                        break;
                     }
                 }
-                break;
-            case '4':
+            }
+            break;
+        case '4':
+        {
+            string username;
+            cout << "Enter your username: ";
+            getline(cin, username);
+            for (Account &acc : accounts)
+            {
+                if (isUserExists(acc.username))
                 {
-                    string username;
-                    cout << "Enter your username: ";
-                    getline(cin, username);
-                    for (Account& acc : accounts) {
-                        if (isUserExists(acc.username)) {
-                            changePassword(accounts, acc);
-                            break;
-                        }
-                    }
+                    changePassword(accounts, acc);
+                    break;
                 }
-                break;
-            case '5':
-                cout << "Exiting program . . ." << endl;
-                break;
-            default:
-                cout << "Invalid choice. Please try again." << endl;
+            }
+        }
+        break;
+        case '5':
+            cout << "Exiting program . . ." << endl;
+            break;
+        default:
+            cout << "Invalid choice. Please try again." << endl;
         }
     } while (choice != '4');
 
