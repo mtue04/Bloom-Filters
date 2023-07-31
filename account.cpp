@@ -1,6 +1,7 @@
 #include "account.h"
 
 void loadWeakPasswords() {
+    // Open file "WeakPass.txt" and load it to Bloom Filter
     ifstream ifs("WeakPass.txt");
     if (!ifs.is_open())
         return;
@@ -152,6 +153,7 @@ void multipleRegistrations(vector<Account> &accounts) {
 }
 
 bool checkLogIn(vector<Account> accounts, Account account) {
+    // Check whether account is exist
     if (isUserExists(account.username)) {
         for (int i = 0; i < accounts.size(); i++) 
             if (accounts[i].username == account.username && accounts[i].password == account.password)
@@ -164,6 +166,7 @@ bool checkLogIn(vector<Account> accounts, Account account) {
 }
 
 bool login(vector<Account> accounts, Account &acc) {
+    // Implement login function
     Account account;
     cout << "USERNAME: ";
     cin >> account.username;
@@ -179,6 +182,7 @@ bool login(vector<Account> accounts, Account &acc) {
 }
 
 void changePassword(vector<Account> &accounts, Account &account) {
+    // Implement change password
     string newPassword;
     string newPasswordCheck;
     cout << "NEW PASSWORD: ";

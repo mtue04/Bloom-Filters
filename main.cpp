@@ -54,21 +54,6 @@ int main()
             }
             break;
         case '4':
-        {
-            string username;
-            cout << "Enter your username: ";
-            getline(cin, username);
-            for (Account &acc : accounts)
-            {
-                if (isUserExists(acc.username))
-                {
-                    changePassword(accounts, acc);
-                    break;
-                }
-            }
-        }
-        break;
-        case '5':
             cout << "Exiting program . . ." << endl;
             break;
         default:
