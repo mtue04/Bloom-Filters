@@ -6,7 +6,6 @@ int main()
 {
     Account account;
     vector<Account> accounts;
-    loadAccounts(accounts);
     loadWeakPasswords();
 
     char choice;
